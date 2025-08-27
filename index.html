@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Resume Analyzer</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 2.4rem;
+      margin-bottom: 25px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    input[type="file"] {
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 1rem;
+      background: rgba(255 255 255 / 0.9);
+      color: #333;
+      transition: box-shadow 0.3s ease;
+      margin-bottom: 20px;
+      width: 280px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    input[type="file"]:hover {
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    button {
+      background: linear-gradient(45deg, #ff6a00, #ee0979);
+      border: none;
+      padding: 14px 36px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 40px;
+      cursor: pointer;
+      color: white;
+      box-shadow: 0 4px 14px rgba(238, 9, 121, 0.7);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(255, 105, 180, 0.9);
+    }
+
+    #result {
+      margin-top: 30px;
+      white-space: pre-wrap;
+      background: white;
+      color: #333;
+      padding: 20px;
+      width: 90vw;
+      max-width: 600px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      min-height: 100px;
+      font-size: 1rem;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      input[type="file"] {
+        width: 90vw;
+      }
+      button {
+        width: 90vw;
+        padding: 14px 0;
+      }
+      #result {
+        width: 90vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Upload Your Resume (PDF)</h2>
+  <input type="file" id="resumeInput" accept="application/pdf" />
+  <button onclick="analyzeResume()">Analyze</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function analyzeResume() {
+      const fileInput = document.getElementById('resumeInput');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Please upload a PDF resume.');
+        return;
+      }
+
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a valid PDF file.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerText = 'Analyzing...';
+
+      try {
+        const response = await fetch('http://localhost:5000/analyze', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(Server error: ${response.statusText});
+        }
+
+        const data = await response.json();
+        resultDiv.innerText = data.result || 'No result returned.';
+      } catch (error) {
+        resultDiv.innerText = 'Error analyzing resume.';
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
